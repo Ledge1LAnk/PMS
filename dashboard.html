@@ -231,6 +231,16 @@
             color: var(--text-color);
         }
 
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        #vitalsChart {
+            max-height: 300px;
+        }
+
         .medicine-logs {
             background: var(--card-bg);
             padding: 25px;
@@ -462,7 +472,9 @@
 
             <div class="chart-container">
                 <h2>📈 Vitals Trend</h2>
-                <canvas id="vitalsChart" width="400" height="200"></canvas>
+                <div class="chart-wrapper">
+                    <canvas id="vitalsChart"></canvas>
+                </div>
             </div>
 
             <div class="medicine-logs">
@@ -492,7 +504,7 @@
 
         // Hardcoded credentials
         const credentials = {
-            'doctor': { password: 'doctor123', role: 'doctor', name: 'Dr. Smith' },
+            'doctor': { password: 'doctor123', role: 'doctor', name: 'Dr. Anna' },
             'patient1': { password: 'patient123', role: 'patient', name: 'Patient 1', deviceId: 'device_28562F4A' },
             'patient2': { password: 'patient456', role: 'patient', name: 'Patient 2', deviceId: 'device_87654321' }
         };
@@ -704,7 +716,7 @@
             vitalsChart = new Chart(ctx, {
                 type: "bar",
                 data: {
-                    labels: ["Temperature (°C)", "Heart Rate (BPM)", "SpO₂ (%)", "Room Temp (°C)", "Humidity (%)"],
+                    labels: ["Temp", "HR", "SpO₂", "Room", "Humidity"],
                     datasets: [{ 
                         label: 'Current Vitals',
                         data: [
@@ -720,24 +732,60 @@
                             (vitalsData.oxygenLevel < 95) ? '#f44336' : '#4caf50',
                             (vitalsData.roomTemp > 30 || vitalsData.roomTemp < 18) ? '#f44336' : '#4caf50',
                             (vitalsData.humidity > 65 || vitalsData.humidity < 25) ? '#f44336' : '#4caf50'
-                        ]
+                        ],
+                        borderColor: [
+                            (vitalsData.temperature > 37.5 || vitalsData.temperature < 36.0) ? '#d32f2f' : '#2e7d32',
+                            (vitalsData.heartRate > 100 || vitalsData.heartRate < 60) ? '#d32f2f' : '#2e7d32',
+                            (vitalsData.oxygenLevel < 95) ? '#d32f2f' : '#2e7d32',
+                            (vitalsData.roomTemp > 30 || vitalsData.roomTemp < 18) ? '#d32f2f' : '#2e7d32',
+                            (vitalsData.humidity > 65 || vitalsData.humidity < 25) ? '#d32f2f' : '#2e7d32'
+                        ],
+                        borderWidth: 1
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { display: false }
+                        legend: { 
+                            display: false 
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const labels = ['Temperature (°C)', 'Heart Rate (BPM)', 'SpO₂ (%)', 'Room Temp (°C)', 'Humidity (%)'];
+                                    return labels[context.dataIndex] + ': ' + context.parsed.y.toFixed(1);
+                                }
+                            }
+                        }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: { color: labelColor },
-                            grid: { color: gridColor }
+                            max: 100,
+                            ticks: { 
+                                color: labelColor,
+                                font: { size: 12 }
+                            },
+                            grid: { 
+                                color: gridColor,
+                                drawBorder: false
+                            }
                         },
                         x: {
-                            ticks: { color: labelColor },
-                            grid: { color: gridColor }
+                            ticks: { 
+                                color: labelColor,
+                                font: { size: 12 }
+                            },
+                            grid: { 
+                                display: false
+                            }
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            top: 10,
+                            bottom: 10
                         }
                     }
                 }
