@@ -442,10 +442,10 @@
                 <div class="patient-selector" id="patientSelector">
                     <h3>👥 Patients</h3>
                     <div class="patient-list" id="patientList">
-                        <div class="patient-item" data-patient="device_12345678">
+                        <div class="patient-item" data-patient="device_28562F4A">
                             <div class="patient-info">
                                 <h4>Patient 1</h4>
-                                <div class="patient-status">Device: device_12345678</div>
+                                <div class="patient-status">Device: device_28562F4A</div>
                             </div>
                             <div class="status-dot" id="patient1Status"></div>
                         </div>
@@ -493,13 +493,13 @@
         // Hardcoded credentials
         const credentials = {
             'doctor': { password: 'doctor123', role: 'doctor', name: 'Dr. Smith' },
-            'patient1': { password: 'patient123', role: 'patient', name: 'Patient 1', deviceId: 'device_12345678' },
+            'patient1': { password: 'patient123', role: 'patient', name: 'Patient 1', deviceId: 'device_28562F4A' },
             'patient2': { password: 'patient456', role: 'patient', name: 'Patient 2', deviceId: 'device_87654321' }
         };
 
         // Global variables
         let currentUser = null;
-        let currentPatient = 'device_12345678';
+        let currentPatient = 'device_28562F4A'; // Updated to match actual device ID
         let vitalsChart = null;
         let isOnline = false;
         let lastVitalsData = {};
@@ -507,13 +507,18 @@
         // Login functionality
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
             const errorDiv = document.getElementById('errorMessage');
+
+            console.log('Login attempt:', { username, password });
+            console.log('Available credentials:', Object.keys(credentials));
 
             if (credentials[username] && credentials[username].password === password) {
                 currentUser = credentials[username];
                 currentUser.username = username;
+                
+                console.log('Login successful:', currentUser);
                 
                 // Show dashboard
                 document.getElementById('loginScreen').classList.add('hidden');
@@ -523,7 +528,8 @@
                 updateUIForUser();
                 initializeDashboard();
             } else {
-                errorDiv.textContent = 'Invalid username or password';
+                console.log('Login failed - invalid credentials');
+                errorDiv.textContent = 'Invalid username or password. Try: doctor/doctor123, patient1/patient123, or patient2/patient456';
             }
         });
 
@@ -678,7 +684,7 @@
 
         // Update patient status
         function updatePatientStatus(online) {
-            const statusDot = document.getElementById(currentPatient === 'device_12345678' ? 'patient1Status' : 'patient2Status');
+            const statusDot = document.getElementById(currentPatient === 'device_28562F4A' ? 'patient1Status' : 'patient2Status');
             if (statusDot) {
                 if (online) {
                     statusDot.classList.remove("offline");
